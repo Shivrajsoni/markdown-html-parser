@@ -26,6 +26,14 @@ enum Node {
     ListItem(Vec<Node>),
 }
 
+
+pub fn to_html(input: &str) -> String {
+    let tokens = lex(input);
+    let ast = parse(&tokens);
+    render(&ast)
+}
+
+
 fn lex(input: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut chars = input.chars().peekable();
@@ -69,7 +77,8 @@ fn lex(input: &str) -> Vec<Token> {
             '[' => {
                 let mut text = String::new();
                 while let Some(&ch) = chars.peek() {
-                    if ch == ']' {
+                    if ch == ']'
+                    {
                         break;
                     }
                     text.push(chars.next().unwrap());

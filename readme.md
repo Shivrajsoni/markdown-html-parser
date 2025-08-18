@@ -1,7 +1,85 @@
-🔹 Step 5: Going Further
+# Markdown to HTML Parser in Rust
 
-Once you master this pipeline:
-	1.	Add unordered lists (- item). -done 
-	2.	Add inline code (`code`).
-	3.	Add links [text](url). - done 
-  4.> Add image tag also 
+A simple, lightweight library for converting Markdown to HTML, written in pure, safe Rust. This project aims to provide a straightforward and easy-to-use package for your Rust applications.
+
+## ✨ Features
+
+Currently, the following Markdown syntax is supported:
+
+- [x] Headings (`#`, `##`, `###`, etc.)
+- [x] Bold text (`**text**`)
+- [x] Italic text (`*text*`)
+- [x] Links (`[display text](url)`)
+- [x] Unordered Lists (`- list item`)
+
+## 🏛️ Architecture
+
+The conversion process happens in three main stages:
+
+1.  **Lexing**: The input Markdown string is scanned and broken down into a sequence of "tokens". For example, `**hello**` becomes `[BoldStart, Text("hello"), BoldEnd]`.
+2.  **Parsing**: The sequence of tokens is converted into a hierarchical structure called an Abstract Syntax Tree (AST). This tree represents the document's structure (e.g., a paragraph containing bold text).
+3.  **Rendering**: The AST is traversed, and for each node in the tree, the corresponding HTML is generated.
+
+This can be visualized as follows:
+
+```mermaid
+graph TD
+    A[Markdown String] --> B{Lexer};
+    B --> C[Vector of Tokens];
+    C --> D{Parser};
+    D --> E[Abstract Syntax Tree (AST)];
+    E --> F{Renderer};
+    F --> G[HTML String];
+```
+
+## 🚀 Usage
+
+1.  Add this library to your project's `Cargo.toml`. Since this package is not yet on crates.io, you can include it using a path dependency:
+
+    ```toml
+    [dependencies]
+    markdown_parser = { path = "../path/to/this/project" } # Adjust the path accordingly
+    ```
+
+2.  Use the `to_html` function in your code:
+
+    ```rust
+    // main.rs
+    extern crate markdown_to_html_parser;
+
+    fn main() {
+        let markdown = "## Hello, World!\n\nThis is a **test** of our *new* parser.\n\n- Item 1\n- Item 2";
+        let html = markdown_to_html_parser::to_html(markdown);
+        println!("{}", html);
+    }
+    ```
+
+## Examples
+
+Here are a few examples of the conversion in action.
+
+**Input:**
+````markdown
+# Main Title
+
+This is a paragraph with **bold** and *italic* text. Here is a [link to GitHub](https://github.com).
+
+- First list item
+- Second list item
+````
+
+**Output:**
+```html
+<h1>Main Title</h1>
+<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text. Here is a <a href="https://github.com">link to GitHub</a>.</p>
+<ul>
+<li>First list item</li>
+<li>Second list item</li>
+</ul>
+```
+
+## 🤝 Contributing
+
+This project is under active development. Contributions, issues, and feature requests are welcome!
+
+```
