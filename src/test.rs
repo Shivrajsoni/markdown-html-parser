@@ -178,3 +178,55 @@ fn test_render_link() {
         "<a href=\"https://github.com/Shivrajsoni\">github</a>",
     );
 }
+
+#[test]
+fn test_lex_unordered_list() {
+    let input = "- item one
+- item two";
+    let expected = vec![
+        Token::ListItemStart,
+        Token::Text("item one".to_string()),
+        Token::NewLine,
+        Token::ListItemStart,
+        Token::Text("item two".to_string()),
+    ];
+    assert_eq!(lex(input), expected);
+}
+
+#[test]
+fn test_parse_unordered_list() {
+    let tokens = vec![
+        Token::ListItemStart,
+        Token::Text("item one".to_string()),
+        Token::NewLine,
+        Token::ListItemStart,
+        Token::Text("item two".to_string()),
+    ];
+    let expected = Node::Document(vec![Node::UnorderedList(vec![
+        Node::ListItem(vec![Node::Text("item one".to_string())]),
+        Node::ListItem(vec![Node::Text("item two".to_string())]),
+    ])]);
+    assert_eq!(parse(&tokens), expected);
+}
+
+#[test]
+fn test_render_unordered_list() {
+    let node = Node::Document(vec![Node::UnorderedList(vec![
+        Node::ListItem(vec![Node::Text("item one".to_string())]),
+        Node::ListItem(vec![Node::Text("item two".to_string())]),
+    ])]);
+    let expected = "<ul>\n<li>item one</li>\n<li>item two</li>\n</ul>";
+    assert_eq!(render(&node), expected);
+}
+
+#[test]
+fn test_full_process_unordered_list() {
+    let input = "- first item
+- second item";
+    let tokens = lex(input);
+    let ast = parse(&tokens);
+    let html = render(&ast);
+    let expected_html = "<ul>\n<li>first item</li>\n<li>second item</li>\n</ul>";
+    assert_eq!(html, expected_html);
+}
+

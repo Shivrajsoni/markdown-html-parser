@@ -10,6 +10,7 @@ enum Token {
     Text(String),
     NewLine,
     Link { text: String, url: String },
+    ListItemStart,
 }
 
 #[derive(Debug, PartialEq)]
@@ -21,6 +22,8 @@ enum Node {
     Italic(Vec<Node>),
     Text(String),
     Link { text: String, url: String },
+    UnorderedList(Vec<Node>),
+    ListItem(Vec<Node>),
 }
 
 fn lex(input: &str) -> Vec<Token> {
@@ -108,12 +111,19 @@ fn lex(input: &str) -> Vec<Token> {
                     tokens.push(Token::Text(text));
                 }
             }
-
+            '-' => {
+                if chars.peek() == Some(&' ') {
+                    chars.next(); // consume the space
+                    tokens.push(Token::ListItemStart);
+                } else {
+                    tokens.push(Token::Text("-".to_string()));
+                }
+            }
             _ => {
                 let mut buff = String::new();
                 buff.push(c);
                 while let Some(&next) = chars.peek() {
-                    if next == '#' || next == '*' || next == '\n' || next == '[' {
+                    if next == '#' || next == '*' || next == '\n' || next == '[' || next == '-' {
                         break;
                     }
                     buff.push(chars.next().unwrap());
@@ -127,24 +137,62 @@ fn lex(input: &str) -> Vec<Token> {
 
 fn parse(tokens: &[Token]) -> Node {
     let mut nodes = Vec::new();
-    // We split the tokens by NewLine to get logical "lines" or "blocks".
-    // This is a simpler way to group tokens for paragraphs or headings.
-    for line_tokens in tokens.split(|tok| *tok == Token::NewLine) {
+    let mut i = 0;
+    while i < tokens.len() {
+        let end_of_line = tokens[i..]
+            .iter()
+            .position(|t| *t == Token::NewLine)
+            .map_or(tokens.len(), |p| i + p);
+        let line_tokens = &tokens[i..end_of_line];
+
         if line_tokens.is_empty() {
+            i = end_of_line + 1;
             continue;
         }
+
         match &line_tokens[0] {
             Token::Heading(level) => {
-                // The rest of the tokens on the line are the heading's content.
                 let content = parse_inlines(&line_tokens[1..]);
                 nodes.push(Node::Heading(*level, content));
             }
-            // Anything else that is not a heading, we'll treat as a paragraph.
+            Token::ListItemStart => {
+                let mut list_items = Vec::new();
+
+                // First item
+                let item_content = parse_inlines(&line_tokens[1..]);
+                list_items.push(Node::ListItem(item_content));
+                i = end_of_line + 1;
+
+                // Process subsequent list items
+                while i < tokens.len() {
+                    let next_line_end = tokens[i..]
+                        .iter()
+                        .position(|t| *t == Token::NewLine)
+                        .map_or(tokens.len(), |p| i + p);
+                    let next_line_tokens = &tokens[i..next_line_end];
+
+                    if next_line_tokens.is_empty() {
+                        i = next_line_end + 1;
+                        break; // Blank line ends the list
+                    }
+
+                    if let Some(Token::ListItemStart) = next_line_tokens.first() {
+                        let item_content = parse_inlines(&next_line_tokens[1..]);
+                        list_items.push(Node::ListItem(item_content));
+                        i = next_line_end + 1;
+                    } else {
+                        break; // Not a list item, so the list ends
+                    }
+                }
+                nodes.push(Node::UnorderedList(list_items));
+                continue; // Continue the main loop
+            }
             _ => {
                 let content = parse_inlines(line_tokens);
                 nodes.push(Node::Paragraph(content));
             }
         }
+        i = end_of_line + 1;
     }
     Node::Document(nodes)
 }
@@ -202,7 +250,7 @@ fn parse_inlines(tokens: &[Token]) -> Vec<Node> {
                 i += 1;
             }
             // We shouldn't encounter these here if our block parsing is correct, but we'll skip them.
-            Token::Heading(_) | Token::NewLine | Token::BoldEnd | Token::ItalicEnd => {
+            Token::Heading(_) | Token::NewLine | Token::BoldEnd | Token::ItalicEnd | Token::ListItemStart => {
                 i += 1;
             }
         }
@@ -232,6 +280,17 @@ fn render(node: &Node) -> String {
         Node::Text(text) => text.clone(),
         Node::Link { text, url } => {
             format!("<a href=\"{}\">{}</a>", url, text)
+        }
+        Node::UnorderedList(children) => {
+            let items = children
+                .iter()
+                .map(render)
+                .collect::<Vec<String>>()
+                .join("\n");
+            format!("<ul>\n{}\n</ul>", items)
+        }
+        Node::ListItem(children) => {
+            format!("<li>{}</li>", render_all(children))
         }
     }
 }
