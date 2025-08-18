@@ -20,17 +20,7 @@ The conversion process happens in three main stages:
 2.  **Parsing**: The sequence of tokens is converted into a hierarchical structure called an Abstract Syntax Tree (AST). This tree represents the document's structure (e.g., a paragraph containing bold text).
 3.  **Rendering**: The AST is traversed, and for each node in the tree, the corresponding HTML is generated.
 
-This can be visualized as follows:
 
-```mermaid
-graph TD
-    A[Markdown String] --> B{Lexer};
-    B --> C[Vector of Tokens];
-    C --> D{Parser};
-    D --> E[Abstract Syntax Tree (AST)];
-    E --> F{Renderer};
-    F --> G[HTML String];
-```
 
 ## 🚀 Usage
 
