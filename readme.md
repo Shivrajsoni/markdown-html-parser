@@ -1,6 +1,6 @@
 # Markdown to HTML Parser in Rust
 
-A simple, lightweight library for converting Markdown to HTML, written in pure, safe Rust. This project aims to provide a straightforward and easy-to-use package for your Rust applications.
+A simple, lightweight library for converting Markdown to HTML, written in pure, safe Rust. This project aims to provide a straightforward and easy-to-use package for your Rust applications
 
 ## ✨ Features
 
