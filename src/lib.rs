@@ -1,4 +1,3 @@
-use std::fmt::format;
 pub mod test;
 #[derive(Debug, PartialEq)]
 enum Token {
@@ -11,6 +10,7 @@ enum Token {
     NewLine,
     Link { text: String, url: String },
     ListItemStart,
+    CodeBlock(String),
 }
 
 #[derive(Debug, PartialEq)]
@@ -24,15 +24,14 @@ enum Node {
     Link { text: String, url: String },
     UnorderedList(Vec<Node>),
     ListItem(Vec<Node>),
+    CodeBlock(String),
 }
-
 
 pub fn to_html(input: &str) -> String {
     let tokens = lex(input);
     let ast = parse(&tokens);
     render(&ast)
 }
-
 
 fn lex(input: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
@@ -77,8 +76,7 @@ fn lex(input: &str) -> Vec<Token> {
             '[' => {
                 let mut text = String::new();
                 while let Some(&ch) = chars.peek() {
-                    if ch == ']'
-                    {
+                    if ch == ']' {
                         break;
                     }
                     text.push(chars.next().unwrap());
@@ -128,11 +126,64 @@ fn lex(input: &str) -> Vec<Token> {
                     tokens.push(Token::Text("-".to_string()));
                 }
             }
+            '`' => {
+                let mut p = chars.clone();
+                if p.next() == Some('`') && p.next() == Some('`') {
+                    // Consume the ```
+                    chars.next();
+                    chars.next();
+
+                    // Consume optional language specifier, and the rest of the line.
+                    while let Some(c) = chars.peek() {
+                        if *c == '\n' {
+                            break;
+                        }
+                        chars.next();
+                    }
+                    if chars.peek() == Some(&'\n') {
+                        chars.next(); // Consume the newline
+                    }
+
+                    let mut code = String::new();
+                    'code_block: loop {
+                        if let Some('`') = chars.peek() {
+                            let mut p2 = chars.clone();
+                            p2.next(); // `
+                            if let Some('`') = p2.peek() {
+                                p2.next(); // `
+                                if let Some('`') = p2.peek() {
+                                    // Found end fence
+                                    chars.next();
+                                    chars.next();
+                                    chars.next();
+                                    break 'code_block;
+                                }
+                            }
+                        }
+
+                        if let Some(c) = chars.next() {
+                            code.push(c);
+                        } else {
+                            // Unterminated
+                            break 'code_block;
+                        }
+                    }
+                    tokens.push(Token::CodeBlock(code));
+                } else {
+                    tokens.push(Token::Text("`".to_string()));
+                }
+            }
             _ => {
                 let mut buff = String::new();
                 buff.push(c);
                 while let Some(&next) = chars.peek() {
-                    if next == '#' || next == '*' || next == '\n' || next == '[' || next == '-' {
+                    if next == '#'
+                        || next == '*'
+                        || next == '\n'
+                        || next == '['
+                        || next == '-'
+                        || next == '`'
+                    {
                         break;
                     }
                     buff.push(chars.next().unwrap());
@@ -148,6 +199,12 @@ fn parse(tokens: &[Token]) -> Node {
     let mut nodes = Vec::new();
     let mut i = 0;
     while i < tokens.len() {
+        if let Some(Token::CodeBlock(content)) = tokens.get(i) {
+            nodes.push(Node::CodeBlock(content.clone()));
+            i += 1;
+            continue;
+        }
+
         let end_of_line = tokens[i..]
             .iter()
             .position(|t| *t == Token::NewLine)
@@ -259,7 +316,12 @@ fn parse_inlines(tokens: &[Token]) -> Vec<Node> {
                 i += 1;
             }
             // We shouldn't encounter these here if our block parsing is correct, but we'll skip them.
-            Token::Heading(_) | Token::NewLine | Token::BoldEnd | Token::ItalicEnd | Token::ListItemStart => {
+            Token::Heading(_)
+            | Token::NewLine
+            | Token::BoldEnd
+            | Token::ItalicEnd
+            | Token::ListItemStart
+            | Token::CodeBlock(_) => {
                 i += 1;
             }
         }
@@ -286,9 +348,16 @@ fn render(node: &Node) -> String {
         Node::Italic(children) => {
             format!("<em>{}</em>", render_all(children))
         }
-        Node::Text(text) => text.clone(),
+        Node::Text(text) => text
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;"),
         Node::Link { text, url } => {
-            format!("<a href=\"{}\">{}</a>", url, text)
+            let escaped_text = text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+            format!("<a href=\"{}\">{}</a>", url, escaped_text)
         }
         Node::UnorderedList(children) => {
             let items = children
@@ -300,6 +369,13 @@ fn render(node: &Node) -> String {
         }
         Node::ListItem(children) => {
             format!("<li>{}</li>", render_all(children))
+        }
+        Node::CodeBlock(content) => {
+            let escaped_content = content
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+            format!("<pre><code>{}</code></pre>", escaped_content)
         }
     }
 }
