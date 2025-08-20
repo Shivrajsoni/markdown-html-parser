@@ -33,18 +33,18 @@ The conversion process happens in three main stages:
 
     ```rust
     // main.rs
-    extern crate markdown_to_html_parser;
+    extern crate mark-html;
 
     fn main() {
         let markdown = "## Hello, World!\n\nThis is a **test** of our *new* parser.\n\n- Item 1\n- Item 2";
-        let html = markdown_to_html_parser::to_html(markdown);
+        let html = mark-html::to_html(markdown);
         println!("{}", html);
     }
     ```
 
 ## What's New in 0.1.0
 
-*   Initial release of the `markdown-to-html-parser` crate!
+*   Initial release of the `mark-html` crate!
 *   Added support for basic Markdown features like headings, bold, italic, links, and unordered lists.
 
 ## Examples
