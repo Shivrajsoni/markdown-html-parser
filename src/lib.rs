@@ -1,3 +1,4 @@
+#[cfg(test)]
 pub mod test;
 #[derive(Debug, PartialEq)]
 enum Token {

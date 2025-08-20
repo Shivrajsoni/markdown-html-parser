@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "markdown-to-html-parser"
+name = "markdown-to-html-parser-shivraj"
 version = "0.1.0"
