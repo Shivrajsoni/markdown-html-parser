@@ -12,6 +12,37 @@ Currently, the following Markdown syntax is supported:
 - [x] Links (`[display text](url)`)
 - [x] Unordered Lists (`- list item`)
 - [x] Code Blocks  (`- codeblock item`)
+
+## 📦 Installation
+
+To use `mark-html` in your project, you can add it to your `Cargo.toml` file:
+
+```toml
+[dependencies]
+mark-html = "0.2.0"
+```
+
+Alternatively, you can use the `cargo add` command:
+
+```sh
+cargo add mark-html
+```
+
+## 🚀 Usage
+
+Once the crate is added to your project, you can use the `to_html` function in your code:
+
+```rust
+// main.rs
+extern crate mark-html;
+
+fn main() {
+    let markdown = "## Hello, World!\n\nThis is a **test** of our *new* parser.\n\n- Item 1\n- Item 2";
+    let html = mark-html::to_html(markdown);
+    println!("{}", html);
+}
+```
+
 ## 🏛️ Architecture
 
 The conversion process happens in three main stages:
@@ -20,32 +51,9 @@ The conversion process happens in three main stages:
 2.  **Parsing**: The sequence of tokens is converted into a hierarchical structure called an Abstract Syntax Tree (AST). This tree represents the document's structure (e.g., a paragraph containing bold text).
 3.  **Rendering**: The AST is traversed, and for each node in the tree, the corresponding HTML is generated.
 
-## 🚀 Usage
+## What's New in 0.2.0
 
-1.  Add this library to your project's `Cargo.toml`:
-
-    ```toml
-    [dependencies]
-    mark-html = "0.1.0"
-    ```
-
-2.  Use the `to_html` function in your code:
-
-    ```rust
-    // main.rs
-    extern crate mark-html;
-
-    fn main() {
-        let markdown = "## Hello, World!\n\nThis is a **test** of our *new* parser.\n\n- Item 1\n- Item 2";
-        let html = mark-html::to_html(markdown);
-        println!("{}", html);
-    }
-    ```
-
-## What's New in 0.1.0
-
-*   Initial release of the `mark-html` crate!
-*   Added support for basic Markdown features like headings, bold, italic, links, and unordered lists.
+*   Added support for code blocks.
 
 ## Examples
 
