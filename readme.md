@@ -20,15 +20,13 @@ The conversion process happens in three main stages:
 2.  **Parsing**: The sequence of tokens is converted into a hierarchical structure called an Abstract Syntax Tree (AST). This tree represents the document's structure (e.g., a paragraph containing bold text).
 3.  **Rendering**: The AST is traversed, and for each node in the tree, the corresponding HTML is generated.
 
-
-
 ## 🚀 Usage
 
-1.  Add this library to your project's `Cargo.toml`. Since this package is not yet on crates.io, you can include it using a path dependency:
+1.  Add this library to your project's `Cargo.toml`:
 
     ```toml
     [dependencies]
-    markdown_parser = { path = "../path/to/this/project" } # Adjust the path accordingly
+    markdown-to-html-parser = "0.1.0"
     ```
 
 2.  Use the `to_html` function in your code:
@@ -43,6 +41,11 @@ The conversion process happens in three main stages:
         println!("{}", html);
     }
     ```
+
+## What's New in 0.1.0
+
+*   Initial release of the `markdown-to-html-parser` crate!
+*   Added support for basic Markdown features like headings, bold, italic, links, and unordered lists.
 
 ## Examples
 
