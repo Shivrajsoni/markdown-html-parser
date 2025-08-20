@@ -11,7 +11,7 @@ Currently, the following Markdown syntax is supported:
 - [x] Italic text (`*text*`)
 - [x] Links (`[display text](url)`)
 - [x] Unordered Lists (`- list item`)
-
+- [x] Code Blocks  (`- codeblock item`)
 ## 🏛️ Architecture
 
 The conversion process happens in three main stages:
@@ -26,7 +26,7 @@ The conversion process happens in three main stages:
 
     ```toml
     [dependencies]
-    markdown-to-html-parser = "0.1.0"
+    mark-html = "0.1.0"
     ```
 
 2.  Use the `to_html` function in your code:
@@ -55,7 +55,7 @@ Here are a few examples of the conversion in action.
 ````markdown
 # Main Title
 
-This is a paragraph with **bold** and *italic* text. Here is a [link to GitHub](https://github.com).
+This is a paragraph with **bold** and *italic* text. Here is a [link to GitHub](https://github.com/Shivrajsoni).
 
 - First list item
 - Second list item
