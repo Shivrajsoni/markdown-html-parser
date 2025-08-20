@@ -1,12 +1,12 @@
 [package]
-name = "markdown-to-html-parser-shivraj"
+name = "mark-html"
 version = "0.1.0"
 edition = "2024"
 description = "A simple and efficient Markdown to HTML parser written in Rust."
 license = "MIT"
-documentation = "https://github.com/Shivrajsoni/term_colr/blob/main/README.md"
+documentation = "https://github.com/Shivrajsoni/markdown-to-html-parser/blob/main/README.md"
 readme = "readme.md"
-repository = "https://github.com/shivraj/markdown-to-html-parser"
+repository = "https://github.com/Shivrajsoni/markdown-to-html-parser"
 keywords = ["markdown", "html", "parser"]
 categories = ["text-processing", "web-programming"]
 
