@@ -131,7 +131,7 @@ fn test_render_paragraph() {
     ]);
     assert_eq!(render(&node), "<p>This is <strong>bold</strong>.</p>");
 }
-/*
+
 #[test]
 fn test_render_document() {
     let node = Node::Document(vec![
@@ -204,7 +204,7 @@ fn test_parse_unordered_list() {
     ])]);
     assert_eq!(parse(&tokens), expected);
 }
-/*
+
 #[test]
 fn test_render_unordered_list() {
     let node = Node::Document(vec![Node::UnorderedList(vec![
@@ -214,7 +214,6 @@ fn test_render_unordered_list() {
     let expected = "<ul>\n<li>item one</li>\n<li>item two</li>\n</ul>";
     assert_eq!(render(&node), expected);
 }
-*/
 
 #[test]
 fn test_full_process_unordered_list() {
@@ -245,15 +244,6 @@ fn test_parse_code_block() {
     assert_eq!(parse(&tokens), expected);
 }
 
-/*
-#[test]
-fn test_render_code_block() {
-    let node = Node::CodeBlock("fn main() {\n    println!(\"&lt;Hello&gt;");\n}".to_string());
-    let expected = "<pre><code>fn main() {\n    println!(\"&lt;Hello&gt;");\n}</code></pre>";
-    assert_eq!(render(&node), expected);
-}
-*/
-
 #[test]
 fn test_full_process_code_block() {
     let input = "# Code Example\n\nHere is a block:\n\n```rust\nfn example() -> bool {\n    true\n}\n```\n\nThat was it.";
@@ -267,4 +257,4 @@ fn test_render_text_escaping() {
     let node = Node::Paragraph(vec![Node::Text("<script>".to_string())]);
     assert_eq!(render(&node), "<p>&lt;script&gt;</p>");
 }
-*/
+

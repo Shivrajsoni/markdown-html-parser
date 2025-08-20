@@ -371,10 +371,7 @@ fn render(node: &Node) -> String {
             format!("<li>{}</li>", render_all(children))
         }
         Node::CodeBlock(content) => {
-            let escaped_content = content
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
+            let escaped_content = content;
             format!("<pre><code>{}</code></pre>", escaped_content)
         }
     }
